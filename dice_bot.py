@@ -51,26 +51,26 @@ async def roll(ctx, *, roll : str):
 
     Currently supports:
         XdY + ZdW + ... + M + N
-        max/min XdY + Z
+        -max/-min XdY + Z
     """
     author = ctx.message.author
 
     try:
-        if re.match(r"((\d+d\d+|\d+)\s*[\-\+]+\s*)\s*(\d+d\d+|\d+)", roll):
+        if re.match(r"((\d+d\d+|\d+)\s*[\-\+]+\s*)*\s*(\d+d\d+|\d+)", roll):
+            # 'XdY + ZdW + ... + M + N'
             res = roll_total(roll)
-            print(res[0])
-            await bot.say("{0} rolled {1} from {2}".format(author.mention, res[0], roll))
-        elif re.match(r"(max |min )?\s*(\d+d\d+)(\s*[\-\+]\d+)?", roll):
-            res = roll_extreme( re.sub(r"(max|min)\s+", "", roll), minimum=roll.find("min") == 0)
-            print(res)
-            await bot.say("{0} rolled {1} from {2}".format(author.mention, res, roll))
+            print("Bot result:", res)
+            await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, res[0], roll))
+        elif re.match(r"(-max |-min )+\s*(\d+d\d+)(\s*[\-\+]\d+)?", roll):
+            # '-max XdY + Z', '-min XdY + Z'
+            res = roll_extreme(re.sub(r"(-max|-min)\s+", "", roll), minimum=roll.find("-min") == 0)
+            await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, res, roll))
         else:
-            print("Roll not processed:", roll)
-            await bot.say("{0}, your roll was not processed.".format(author.mention))
+            await bot.say("{0}, you have specified an invalid roll. Please try again.".format(author.mention))
     except Exception as err:
         await bot.say("{0} has specified an invalid roll producing {1}".format(author.mention, err))
         raise err
 
 # Start the bot with the appropriate credentials
-# bot.run('login_email', 'password')
+bot.run('sirmodimore+pythia@gmail.com', 'SnakeCity')
 # bot.run('login_token')
