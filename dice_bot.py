@@ -6,7 +6,13 @@ from discord.ext import commands
 
 import re # regular expression support
 
-from dice_util import roll_total, roll_extreme
+from dice_util import DiceRoller
+
+patterns = {
+    "simple roll": r"((\d+d\d+|\d+)\s*[\-\+]\s*)*\s*(\d+d\d+|\d+)",
+    "flagged roll": r"(\-\w+\s+)+\s*((\d+d\d+|\d+)\s*[\-\+]\s*)*\s*(\d+d\d+|\d+)",
+    "flag": r"\-\w+"
+}
 
 # A dice bot for use with Discord
 bot = commands.Bot(command_prefix='!', description="A Discord chat bot for Tabletop RPG players.")
@@ -50,25 +56,30 @@ async def roll(ctx, *, roll : str):
     Reports result back to channel.
 
     Currently supports:
-        XdY + ZdW + ... + M + N
-        -max/-min XdY + Z
+        (x1)d(y1) + (x2)d(y2) + ... + (xN)d(yN) + m1 + m2 + ... +  mN
+        -max/-min (x1)d(y1) + ... + (xN)d(yN) + m1 + ... +  mN
     """
     author = ctx.message.author
 
     try:
-        if re.match(r"((\d+d\d+|\d+)\s*[\-\+]+\s*)*\s*(\d+d\d+|\d+)", roll):
+        if re.match( patterns["simple roll"], roll ):
             # 'XdY + ZdW + ... + M + N'
-            res = roll_total(roll)
-            print("Bot result:", res)
-            await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, res[0], roll))
-        elif re.match(r"(-max |-min )+\s*(\d+d\d+)(\s*[\-\+]\d+)?", roll):
+            roller = DiceRoller(roll)
+            await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, roller.sum_all_rolls(), roll))
+        elif re.match( patterns["flagged roll"], roll ):
             # '-max XdY + Z', '-min XdY + Z'
-            res = roll_extreme(re.sub(r"(-max|-min)\s+", "", roll), minimum=roll.find("-min") == 0)
-            await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, res, roll))
+            flags = [ f[1:] for f in re.findall( patterns["flag"], roll) ]
+            roller = DiceRoller(re.sub(r"\s*\-\w+\s*", "", roll))
+            if "max" in flags:
+                await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, roller.max_all_rolls(), roll))
+            elif "min" in flags:
+                await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, roller.min_all_rolls(), roll))
+            else:
+                await bot.say("{0} has provided an invalid flag in `{1}`".format(author.mention, roll))
         else:
             await bot.say("{0}, you have specified an invalid roll. Please try again.".format(author.mention))
     except Exception as err:
-        await bot.say("{0} has specified an invalid roll producing {1}".format(author.mention, err))
+        await bot.say("{0} has specified an invalid roll producing `{1}`".format(author.mention, err))
         raise err
 
 # Start the bot with the appropriate credentials

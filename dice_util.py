@@ -3,31 +3,33 @@ from random import randint
 # Regular Expressions for input validation and parsing
 import re
 
-class DiceGroup:
-    def __init__(self, face_max, face_min=1):
+# Dice class to implement rolling functionality
+class BasicDice:
+    def __init__(self, face_max, face_min=1, num_dice=0):
         # Set high and low face values
-        self.face_max = face_max
-        self.face_min = face_min
+        self.high_val = face_max
+        self.low_val = face_min
 
-        # Explicitly nullify roll cache
+        if num_dice != 0:
+            self.roll(num_dice)
 
     # Driving roll function
-    def roll(self, num_times=1):
+    def roll(self, num_dice=1):
         # Roll dice of correct type of times specified
-        self.roll_cache = [randint(self.face_min, self.face_max) for i in range(num_times)]
-        print("Roll Cache:", self.roll_cache)
+        self.roll_cache = [randint(self.low_val, self.high_val) for i in range(num_dice)]
+        # print("Roll Cache:", self.roll_cache)
         self.total = sum(self.roll_cache)
-        print("Roll Total:", self.total)
+        # print("Roll Total:", self.total)
 
     # Roll History Accessors
     def get_last_rollspec(self):
         # return last rolls made in XdY format
         if not self.roll_cache:
             return "No roll made."
-        elif self.face_min != 1:
-            return "{0}d{1}".format(len(self.roll_cache), self.face_max)
+        elif self.low_val != 1:
+            return "{0}d{1}".format(len(self.roll_cache), self.high_val)
         else:
-            return "{0}d{1}-{2}".format(len(self.roll_cache), self.face_min, self.face_max)
+            return "{0}d{1}-{2}".format(len(self.roll_cache), self.low_val, self.high_val)
 
     def get_roll_total(self):
         # Return the integer value of the runnning total of rolls
@@ -46,87 +48,94 @@ class DiceGroup:
         return min(self.roll_cache)
 
     def __repr__(self):
-        return "<DiceGroup [{}-{}] Last Roll: {} ({})>".format(self.face_min, self.face_max, self.result, ', '.join(self.roll_cache))
+        return "<BasicDice [{}-{}] Last Roll: {} ({})>".format(self.low_val, self.high_val, self.result, ', '.join(self.roll_cache))
 
-def parse_roll(roll_str):
-    rolls_out = []
-    mods_out = []
+# Class to manage and report results of all dice rolls
+class DiceRoller:
+    # Roll specification parsing function
+    @staticmethod
+    def parse_spec(spec):
+        # Parse out all dice rolls and range rolls
+        dice_results = []
 
-    for r in re.findall(r"\b(\d+)d(\d+)\b", roll_str):
-        rolls_out.append( (int(r[0]), int(r[1])) )
+        for dice in re.finditer(r"\b(\d+)d(\d+)\b", spec):
+            num_dice, max_val = [ int(x) for x in dice.groups() ]
+            dice_results.append(BasicDice(face_max=max_val, num_dice=num_dice))
 
-    for r in re.findall(r"\b(\-|\+|)\s*(\d+)\b", roll_str):
-        if r[0] != "-":
-            mods_out.append(int(r[1]))
-        else:
-            mods_out.append(-1*int(r[1]))
+        for dice in re.finditer(r"\b(\d+)d(\d+)-(\d+)\b", spec):
+            num_dice, min_val, max_val = [ int(x) for x in dice.groups() ]
+            dice_results.append(BasicDice(face_min=min_val, face_max=max_val, num_dice=num_dice))
 
-    return rolls_out, mods_out
+        # Parse out all modifiers
+        mods = []
+        for mod in re.findall(r"\b[\+\-]?\s*\d+\b", spec):
+            mods.append(int(mod))
 
-def roll_total(roll_str):
-    try:
-        dice_rolls, mods = parse_roll(roll_str)
-    except Exception as err:
-        print(err)
-        return 0, []
+        return dice_results, mods
 
-    details = []
-    total = 0
+    # DiceRoller Constructor
+    def __init__(self, spec):
+        self.dice_results, self.mods = self.parse_spec(spec)
 
-    for roll in dice_rolls:
-        dice = DiceGroup(roll[1])
-        dice.roll(roll[0])
-        total += dice.get_roll_total()
-        details.append(dice.get_roll_cache())
+    # Report sum of all rolls
+    def sum_all_rolls(self):
+        result = 0
 
-    total += sum(mods)
-    details.extend(mods)
+        for res in self.dice_results:
+            result += res.get_roll_total()
 
-    return total, details
+        result += sum(self.mods)
+        return result
 
-def roll_extreme(roll_str, minimum=False):
-    # Sum up the total modifier
-    mod = 0
-    for m in re.findall(r"\b(\-|\+|)\s*(\d+)\b", roll_str):
-        mod += int(m.replace(" ", ""))
+    # Return all individual rolls from a dice
+    def roll_details(self):
+        details = []
+        for res in self.dice_results:
+            details.append(res.get_roll_cache())
+        return details
 
-    # Create the dice specified in the roll string
-    rolls = re.search(r"(\d+)d(\d+)", roll_str)
-    num_dice, dice_max = [int(s) for s in rolls.groups()]
-    dice = DiceGroup(dice_max)
+    # Get maximum roll from all rolls
+    def max_all_rolls(self):
+        max_all = 0
 
-    dice.roll(num_dice)
-    if minimum == True:
-        return dice.get_lowest_roll() + mod
-    else:
-        return dice.get_highest_roll() + mod
+        for res in self.dice_results:
+            max_all += res.get_highest_roll()
+
+        max_all += sum(self.mods)
+        return max_all
+
+    # Get minimum roll from all rolls
+    def min_all_rolls(self):
+        min_all = 0
+
+        for res in self.dice_results:
+            min_all += res.get_lowest_roll()
+
+        min_all += sum(self.mods)
+        return min_all
 
 # Main section for testing
 if __name__ == '__main__':
     from sys import argv
-    from collections import defaultdict
+    # from collections import defaultdict
+    #
+    # def is_int(s):
+    #     try:
+    #         int(s)
+    #         return int(s) == s
+    #     except:
+    #         return False
 
-    def is_int(s):
-        try:
-            int(s)
-            return int(s) == s
-        except:
-            return False
+    roll = ' '.join(argv[1:])
 
-    def dice_test(roll : str):
-        if re.fullmatch(r"((\d+d\d+|\d+)\s*[\-\+]\s*)*\s*(\d+d\d+|\d+)", roll) != None:
-            res = roll_total(roll)
-            print(res[0], res[1])
-        elif re.fullmatch(r"(-max |-min )\s*(\d+d\d+)\s*([\-\+]\s*\d+)?", roll) != None:
-            res = roll_extreme( re.sub(r"(-max|-min)\s*", "", roll), minimum=roll.find("-min ") == 0)
-            print(res)
+    if re.fullmatch(r"((\d+d\d+|\d+)\s*[\-\+]\s*)*\s*(\d+d\d+|\d+)", roll) != None:
+        dr = DiceRoller(roll)
+        print(dr.sum_all_rolls())
+    elif re.fullmatch(r"(-max |-min )\s*(\d+d\d+)\s*([\-\+]\s*\d+)?", roll) != None:
+        dr = DiceRoller( re.sub(r"(-max|-min)\s*", "", roll) )
+        if roll.find("-min ") == 0:
+            print(dr.min_all_rolls())
         else:
-            print("Invalid Roll")
-
-    try:
-        print(argv)
-        for i in range(100):
-            dice_test(' '.join(argv[1:]))
-
-    except Exception as err:
-        print(err)
+            print(dr.max_all_rolls())
+    else:
+        print("Invalid Roll")

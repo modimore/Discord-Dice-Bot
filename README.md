@@ -10,10 +10,8 @@ It uses random, re, and asyncio from the Python standard library, and [discord.p
 
 After installing discord.py, just download the source files for this project and you should be good to go.
 
-To change this script to work with Python 3.4, replace `async def` with 
-```
-@asyncio.corouting
-```
+To change this script to work with Python 3.4,
+replace `async def` with `@asyncio.corouting`
 and `await` with `yield from`.
 
 ## Usage
@@ -21,7 +19,7 @@ and `await` with `yield from`.
 This bot is currently designed to be run directly from *dice_bot.py* almost as provided.
 Before you can use this you must supply a valid Discord login and password or bot token to a call to `bot.run` as follows:
 ```
-bot.run(login_email, password)
+bot.run(account_email, password)
 ```
 or
 ```
@@ -37,4 +35,8 @@ The only currently supported command is `!roll`, which has two use cases.
 
 `!roll (x1)d(y1) + (x2)d(y2) + ... + (xN)d(yN) + (m1) + ... + (mN)` will roll all dice and modifiers and report the total.
 
-`!roll max (x)d(y) + z` will choose the largest d(y) result and add z to it. `!roll min (x)d(y) + (z)` chooses the smallest.
+`!roll max (x)d(y) + z` will choose the highest d(y) result and add z to it.
+`!roll min (x)d(y) + (z)` chooses the smallest.
+
+`!roll max (x1)d(y1) + ... + (xN)d(yN) + (m1) + ... + (mN)` will take the highest number rolled for each d(yn) and sum them with all modifiers.
+`!roll min (x1)d(y1) + ... + (xN)d(yN) + (m1) + ... + (mN)` will do the same, but take the lowest of each.
