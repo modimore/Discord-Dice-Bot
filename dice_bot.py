@@ -6,7 +6,7 @@ from discord.ext import commands
 
 import re # regular expression support
 
-from dice_util import DiceRoller
+from dice_tools import BasicRoller
 
 patterns = {
     "simple roll": r"((\d+d\d+|\d+)\s*[\-\+]\s*)*\s*(\d+d\d+|\d+)",
@@ -63,25 +63,37 @@ async def roll(ctx, *, roll : str):
 
     try:
         if re.match( patterns["simple roll"], roll ):
+            # Handle a simple roll
             # 'XdY + ZdW + ... + M + N'
-            roller = DiceRoller(roll)
-            await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, roller.sum_all_rolls(), roll))
+            roller = BasicRoller(roll)
+            details = ' + '.join(roller.roll_detail_string())
+            await bot.say( "{0} rolled a total of `{1}` from `{2}`".format(author.mention, roller.sum_all_rolls(), details) )
+
         elif re.match( patterns["flagged roll"], roll ):
+            # Handle a roll with flags
             # '-max XdY + Z', '-min XdY + Z'
+
+            # Find all flags
             flags = [ f[1:] for f in re.findall( patterns["flag"], roll) ]
-            roller = DiceRoller(re.sub(r"\s*\-\w+\s*", "", roll))
+
+            # Create a roller from just the dice spec
+            roller = BasicRoller(re.sub(r"\s*\-\w+\s*", "", roll))
+
+            # Say something based on the flags found
             if "max" in flags:
                 await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, roller.max_all_rolls(), roll))
             elif "min" in flags:
                 await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, roller.min_all_rolls(), roll))
             else:
                 await bot.say("{0} has provided an invalid flag in `{1}`".format(author.mention, roll))
+
         else:
             await bot.say("{0}, you have specified an invalid roll. Please try again.".format(author.mention))
     except Exception as err:
+        # If an exception is raised, have the bot say so in the channel
         await bot.say("{0} has specified an invalid roll producing `{1}`".format(author.mention, err))
         raise err
 
 # Start the bot with the appropriate credentials
-bot.run('sirmodimore+pythia@gmail.com', 'SnakeCity')
+# bot.run(login_email, login_password)
 # bot.run('login_token')
