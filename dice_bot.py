@@ -66,7 +66,7 @@ async def roll(ctx, *, roll : str):
             # Handle a simple roll
             # 'XdY + ZdW + ... + M + N'
             roller = BasicRoller(roll)
-            details = ' + '.join(roller.roll_detail_string())
+            details = ' + '.join(roller.roll_detail_strings())
             await bot.say( "{0} rolled a total of `{1}` from `{2}`".format(author.mention, roller.sum_all_rolls(), details) )
 
         elif re.match( patterns["flagged roll"], roll ):
@@ -95,5 +95,5 @@ async def roll(ctx, *, roll : str):
         raise err
 
 # Start the bot with the appropriate credentials
-# bot.run(login_email, login_password)
+bot.run(login_email, password)
 # bot.run('login_token')

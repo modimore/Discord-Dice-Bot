@@ -3,14 +3,8 @@ class Modifier:
     def __init__(self, value):
         self._val = value
 
-    def __int__(self):
-        return self._val
-
-    def __str__(self):
-        return str(self._val)
-    
     @property
-    def total(self):
+    def value(self):
         return self._val
 
     @property

@@ -1,2 +1,2 @@
-from .dice.basic import BasicDice
+from .dice.basic import DiceBase
 from .rollers.basic import BasicRoller
