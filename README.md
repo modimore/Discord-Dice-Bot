@@ -31,12 +31,45 @@ available to you to use this properly.
 ### Supported Commands
 All commands issued to this bot must be prefaced with a *!*.
 
-The only currently supported command is `!roll`, which has two use cases.
+If you are downloading this script and running it yourself, you can change the command prefix character, but *!* is used in all examples here.
 
-`!roll (x1)d(y1) + (x2)d(y2) + ... + (xN)d(yN) + (m1) + ... + (mN)` will roll all dice and modifiers and report the total.
+#### `!roll`
+This is currently the only supported command. The command must be followed by a specification for what you are rolling, which is detailed in the [Dice Specification](#dice-specification) section.
 
-`!roll max (x)d(y) + z` will choose the highest d(y) result and add z to it.
-`!roll min (x)d(y) + (z)` chooses the smallest.
+Write your command to the bot as `!roll (spec)`. Examples would be `!roll 1d10 + 2d8 + 3`, `!roll -avg 2d8 + 3`, and `!roll 1d20:adv + 4`
 
-`!roll max (x1)d(y1) + ... + (xN)d(yN) + (m1) + ... + (mN)` will take the highest number rolled for each d(yn) and sum them with all modifiers.
-`!roll min (x1)d(y1) + ... + (xN)d(yN) + (m1) + ... + (mN)` will do the same, but take the lowest of each.
+## Dice Specification Syntax <a id="dice-specification"></a>
+A dice specification can consists of any combination of valid groups of the same type of dice and constant value modifiers. Only integers are supported by this program.
+
+#### Groups of Dice
+A valid dice specification can take two forms.
+The first, and more likely for you to use is `XdN`, as in `3d6`. The second is `XdM~N`. `XdN` should suggest rolling *X* *N*-sided dice, each producing a number from *1* to *N* inclusive, just like a physical dice would do. `XdM~N` is similar, but the lowest possible value will be *M* rather than *1*.
+
+A few options can be added to individual dice rolls by adding `:opt` to the end of the dice.
+
+- Choose the highest single value from the roll: `best`, `b`, `high`, `h`
+- Choose the lowest single value from the roll: `worst`, `w`, `low`, `l`
+- Roll with advantage \[D&D5E\] (roll in pairs and count the higher of each): `advantage`, `adv`, `a`
+- Roll with disadvantage \[D&D5E\] (roll in pairs and count the lower of the two): `disadvantage`, `disadv`, `da`
+
+As an example, rolling `4d10:best` with rolls of *2*, *4*, *6*, and *7* would get you a result of *7*. Rolling `2d20:adv` you could get *(1, 13)* and *(17, 14)*. You would take the best from each pair, dropping *1* and *12*, to end up with *17 + 13*.
+
+#### Modifiers
+Modifiers are simpler. A modifier is just an integer. `5`. You got it.
+
+#### Bringing it all together
+Combining groups of dice and modifiers is done just like adding numbers. `1d20 + 5` will result in *17* if you rolled a *12*.
+
+You can also subtract modifiers, so if the specification above was `1d20 - 5` instead you would get a result of *7*. Dice groups cannot be subtracted, only added, but this may be changed in the future.
+
+It is worth noting that in most cases, the spaces between dice groups and modifiers will not matter. `1d20 - 5 + 2d6` is functionally equivalent to `1d20-5+2d6` and `1d20- 5 +2d6`, but `1d 20 + 5 + 3 d6` will produce unexpected behaviour.
+
+#### Global Flags
+Global flags given at the start of your roll specification will change the type of output you get.
+
+The currently supported flags are:
+- Get the maximum possible result of the specified roll: `max`
+- Get the minimum possible result of the specified roll: `min`
+- Get (something close to) the average result of the specified roll: `avg`
+
+`!roll -avg 1d20` will give you a result of `10.5`. This is only partially supported in conjunction with dice options. Currently it produces statistically inaccurate results with `best` and `worst`.

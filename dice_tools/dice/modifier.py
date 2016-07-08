@@ -3,6 +3,9 @@ class Modifier:
     def __init__(self, value):
         self._val = value
 
+    def roll(self):
+        pass
+
     @property
     def value(self):
         return self._val
@@ -12,9 +15,13 @@ class Modifier:
         return (self._val,)
 
     @property
-    def highest(self):
+    def max(self):
         return self._val
 
     @property
-    def lowest(self):
+    def min(self):
+        return self._val
+
+    @property
+    def avg(self):
         return self._val

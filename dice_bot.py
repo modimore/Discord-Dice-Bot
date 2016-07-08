@@ -6,15 +6,18 @@ from discord.ext import commands
 
 import re # regular expression support
 
-from dice_tools import BasicRoller
+from dice_tools import DiceRoller
+from dice_tools.rollers.statistical import MaxRoller, MinRoller, AvgRoller
 
-patterns = {
-    "simple roll": r"((\d+d\d+|\d+)\s*[\-\+]\s*)*\s*(\d+d\d+|\d+)",
-    "flagged roll": r"(\-\w+\s+)+\s*((\d+d\d+|\d+)\s*[\-\+]\s*)*\s*(\d+d\d+|\d+)",
-    "flag": r"\-\w+"
-}
+# RegEx patterns used in this script
+patterns = {}
 
-# A dice bot for use with Discord
+patterns["flag"] = r"\-\w+"
+
+patterns["simple roll"] = r"((\d+d(\d+\-)?\d+(:\w+)?|\d+)\s*[\-\+]\s*)*\s*(\d+d(\d+\-)?\d+(:\w+)|\d+)"
+patterns["flagged roll"] = r"({0}\s+)+\s*{1}".format(patterns["flag"], patterns["simple roll"])
+
+# Create dice bot and register commands
 bot = commands.Bot(command_prefix='!', description="A Discord chat bot for Tabletop RPG players.")
 
 @bot.event
@@ -31,22 +34,13 @@ async def on_message(message):
     except Exception as err:
         print(err)
 
-# Testing Commands
-'''
-@bot.command()
-async def echo(*, message : str):
-    await bot.say(message)
-
-@bot.command()
-async def add(*nums):
-    """Adds an arbitrary number of integers together."""
-    await bot.say(sum(map(int, nums)))
-
-@bot.command()
-async def repeat(times : int, *, content='repeating...'):
-    """Repeats a message multiple times."""
-    for i in range(times): await bot.say(content)
-'''
+def construct_message(roller, author, verbose=True):
+    if verbose == False:
+        message = "{0} rolled a total of `{1}`.".format(author.mention, roller.result)
+    else:
+        details = ' + '.join(roller.roll_detail_strings())
+        message = "{0} rolled a total of `{1}` from `{2}`.".format(author.mention, roller.result, details)
+    return message
 
 # !roll command
 @bot.command(pass_context=True, description='Rolls dice.')
@@ -57,36 +51,44 @@ async def roll(ctx, *, roll : str):
 
     Currently supports:
         (x1)d(y1) + (x2)d(y2) + ... + (xN)d(yN) + m1 + m2 + ... +  mN
-        -max/-min (x1)d(y1) + ... + (xN)d(yN) + m1 + ... +  mN
+        with the following dice-specific options applied as '(x)d(y):opt':
+            advantage (adv, a)
+            disadvantage (disadv, da, d)
+            best (b, high, h)
+            worst (w, low, l)
+        and the following roll-global flags added as '-flagname'
+        to the start of the whole roll:
+            max
+            min
+            avg
     """
     author = ctx.message.author
 
     try:
-        if re.match( patterns["simple roll"], roll ):
-            # Handle a simple roll
-            # 'XdY + ZdW + ... + M + N'
-            roller = BasicRoller(roll)
-            details = ' + '.join(roller.roll_detail_strings())
-            await bot.say( "{0} rolled a total of `{1}` from `{2}`".format(author.mention, roller.sum_all_rolls(), details) )
-
-        elif re.match( patterns["flagged roll"], roll ):
-            # Handle a roll with flags
-            # '-max XdY + Z', '-min XdY + Z'
-
+        if re.match( patterns["flagged roll"], roll):
             # Find all flags
             flags = [ f[1:] for f in re.findall( patterns["flag"], roll) ]
 
             # Create a roller from just the dice spec
-            roller = BasicRoller(re.sub(r"\s*\-\w+\s*", "", roll))
+            roll = re.sub(r"\s*\-\w+\s*", "", roll)
 
             # Say something based on the flags found
             if "max" in flags:
-                await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, roller.max_all_rolls(), roll))
+                roller = MaxRoller(roll)
+                await bot.say("{0}, `{2}` is the maximum possible result of `{1}`.".format(author.mention, roll, roller.result))
             elif "min" in flags:
-                await bot.say("{0} rolled `{1}` from `{2}`".format(author.mention, roller.min_all_rolls(), roll))
+                roller = MinRoller(roll)
+                await bot.say("{0}, `{2}` is the minimum possible result of `{1}`.".format(author.mention, roll, roller.result))
+            elif "avg" in flags:
+                roller = AvgRoller(roll)
+                await bot.say("{0}, `{2}` is (close to) the average result of `{1}`.".format(author.mention, roll, roller.result))
             else:
-                await bot.say("{0} has provided an invalid flag in `{1}`".format(author.mention, roll))
-
+                await bot.say("{0} has provided an invalid flag.".format(author.mention, roll))
+        elif re.match( patterns["simple roll"], roll ):
+            # Handle a simple roll
+            # 'XdY + ZdW + ... + M + N'
+            roller = DiceRoller(roll)
+            await bot.say( construct_message(roller, author) )
         else:
             await bot.say("{0}, you have specified an invalid roll. Please try again.".format(author.mention))
     except Exception as err:

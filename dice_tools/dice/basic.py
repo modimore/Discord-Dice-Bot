@@ -1,19 +1,19 @@
-from .dice_base import DiceBase
+from .dice_base import DicePool
 
 # Dice class to implement rolling functionality
-class SimpleDice(DiceBase):
+class SimpleDice(DicePool):
     # Roll History Accessors
     @property
     def value(self):
         # Return the specified value for the dice object
-        return self.total
+        return sum(self._rolls)
 
-class HighestRollDice(DiceBase):
+class HighestRollDice(DicePool):
     @property
     def value(self):
-        return self.highest
+        return max(self._rolls)
 
-class LowestRollDice(DiceBase):
+class LowestRollDice(DicePool):
     @property
     def value(self):
-        return self.lowest
+        return min(self._rolls)
