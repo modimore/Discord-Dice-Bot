@@ -1,3 +1,5 @@
+from ..exceptions import DiceToolsError, NotRolledError
+
 # RNG for roll results
 from random import randint
 
@@ -11,6 +13,9 @@ class DicePool:
         # Set number of dice in pool
         self._num_dice = num_dice
 
+        if self._low > self._high or self._num_dice < 0:
+            raise DiceToolsError()
+
         if roll == True:
             self.roll()
 
@@ -22,6 +27,12 @@ class DicePool:
     def roll(self):
         # Roll dice of correct type of times specified
         self._rolls = [self.roll_die() for i in range(self._num_dice)]
+
+    def get_spec(self):
+        if self._low == 1:
+            return "{0}d{1}".format(self._num_dice, self._high)
+        else:
+            return "{0}d{1}~{2}".format(self._num_dice, self._low, self._high)
 
     # Intended accessor functions
     @property

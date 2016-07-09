@@ -34,11 +34,15 @@ All commands issued to this bot must be prefaced with a *!*.
 If you are downloading this script and running it yourself, you can change the command prefix character, but *!* is used in all examples here.
 
 #### `!roll`
-This is currently the only supported command. The command must be followed by a specification for what you are rolling, which is detailed in the [Dice Specification](#dice-specification) section.
+This is currently the only supported command. The command must be followed by a specification for what you are rolling, which is detailed in the [Dice Specification](#dice-specification-syntax) section.
 
-Write your command to the bot as `!roll (spec)`. Examples would be `!roll 1d10 + 2d8 + 3`, `!roll -avg 2d8 + 3`, and `!roll 1d20:adv + 4`
+Write your command to the bot as `!roll (spec)`. Here are some examples.
 
-## Dice Specification Syntax <a id="dice-specification"></a>
+- `!roll 1d10 + 2d8 + 3`
+- `!roll -avg 2d8 + 3`
+- `!roll 1d20:adv + 4`
+
+## Dice Specification Syntax
 A dice specification can consists of any combination of valid groups of the same type of dice and constant value modifiers. Only integers are supported by this program.
 
 #### Groups of Dice
@@ -62,14 +66,14 @@ Combining groups of dice and modifiers is done just like adding numbers. `1d20 +
 
 You can also subtract modifiers, so if the specification above was `1d20 - 5` instead you would get a result of *7*. Dice groups cannot be subtracted, only added, but this may be changed in the future.
 
-It is worth noting that in most cases, the spaces between dice groups and modifiers will not matter. `1d20 - 5 + 2d6` is functionally equivalent to `1d20-5+2d6` and `1d20- 5 +2d6`, but `1d 20 + 5 + 3 d6` will produce unexpected behaviour.
+It is worth noting that in most cases, the spaces between dice groups and modifiers will not matter. `1d20 - 5 + 2d6` is functionally equivalent to `1d20-5+2d6` and `1d20- 5 +2d6`, but `1d 20 + 5 + 3 d6` will produce unexpected behaviour. The same goes for dice options. `1d20 :adv` and `1d20: adv` are not guaranteed to get you what you were looking for.
 
 #### Global Flags
-Global flags given at the start of your roll specification will change the type of output you get.
+Global flags given at the start of your roll specification will change the type of output you get. The format for this is `-flag`.
 
 The currently supported flags are:
 - Get the maximum possible result of the specified roll: `max`
 - Get the minimum possible result of the specified roll: `min`
 - Get (something close to) the average result of the specified roll: `avg`
 
-`!roll -avg 1d20` will give you a result of `10.5`. This is only partially supported in conjunction with dice options. Currently it produces statistically inaccurate results with `best` and `worst`.
+`!roll -avg 1d20` will give you a result of `10.5`. Roll options and flags can be combined also. `!roll -avg 1d20:adv` will give you a result around `13.8`.

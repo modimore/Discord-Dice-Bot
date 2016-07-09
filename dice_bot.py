@@ -9,6 +9,8 @@ import re # regular expression support
 from dice_tools import DiceRoller
 from dice_tools.rollers.statistical import MaxRoller, MinRoller, AvgRoller
 
+from dice_tools.exceptions import DiceToolsError
+
 # RegEx patterns used in this script
 patterns = {}
 
@@ -90,12 +92,14 @@ async def roll(ctx, *, roll : str):
             roller = DiceRoller(roll)
             await bot.say( construct_message(roller, author) )
         else:
-            await bot.say("{0}, you have specified an invalid roll. Please try again.".format(author.mention))
+            await bot.say("{0}, you haven't really specified a dice roll honestly. Please try harder.".format(author.mention))
+    except DiceToolsError as err:
+        await bot.say("{0}, your roll has produced an error with the following message:\n**{1}**\n Please fix your roll and try again.".format(author.mention, err.get_message()))
     except Exception as err:
         # If an exception is raised, have the bot say so in the channel
-        await bot.say("{0} has specified an invalid roll producing `{1}`".format(author.mention, err))
+        await bot.say("{0}, an unexpected error has occured: {1}.".format(author.mention, err))
         raise err
 
 # Start the bot with the appropriate credentials
-bot.run(login_email, password)
+bot.run('sirmodimore+pythia@gmail.com', 'SnakeCity')
 # bot.run('login_token')
