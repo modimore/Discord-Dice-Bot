@@ -1,3 +1,4 @@
+import os
 import asyncio # Asynchronous I/O (from/to chat channel)
 
 # Discord API (available at https://github.com/Rapptz/discord.py)
@@ -107,5 +108,5 @@ async def roll(ctx, *, roll : str):
         raise err
 
 # Start the bot with the appropriate credentials
-bot.run('sirmodimore+pythia@gmail.com', 'SnakeCity')
-# bot.run('login_token')
+# bot.run(login_email, password)
+bot.run(os.environ["DISCORD_BOT_TOKEN"])
