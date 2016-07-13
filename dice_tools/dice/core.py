@@ -1,14 +1,14 @@
-from .base import DicePool
+from .base import DiceBase
 
 # Dice class to implement rolling functionality
-class SimpleDice(DicePool):
+class SimpleDice(DiceBase):
     # Roll History Accessors
     @property
     def value(self):
         # Return the specified value for the dice object
         return sum(self._rolls) * self._sign
 
-class PickOneDice(DicePool):
+class PickOneDice(DiceBase):
     @property
     def max(self):
         return self._high if not self._negative else self._low

@@ -2,7 +2,7 @@
 import re
 
 # Import dice classes
-from ..dice.simple import SimpleDice, HighestRollDice, LowestRollDice
+from ..dice import SimpleDice, HighestRollDice, LowestRollDice
 from ..dice.dnd_5e import AdvantageDice, DisadvantageDice
 from ..dice.modifier import Modifier
 

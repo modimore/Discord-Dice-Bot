@@ -1,4 +1,4 @@
-from .default import DiceRoller
+from . import DiceRoller
 
 class StatRoller(DiceRoller):
     def __init__(self, spec):

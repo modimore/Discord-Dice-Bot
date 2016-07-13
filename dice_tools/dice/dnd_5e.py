@@ -1,4 +1,4 @@
-from .simple import SimpleDice
+from .core import SimpleDice
 
 class AdvantageDice(SimpleDice):
     def roll(self):

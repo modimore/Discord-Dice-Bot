@@ -5,7 +5,7 @@ from random import randint
 
 # Base dice class
 # Implements straightforward rolling functionality and basic utilities
-class DicePool:
+class DiceBase:
     def __init__(self, face_max, face_min=1, num_dice=1, negative=False):
         # Set high and low face values
         self._low = face_min if face_min is not None else 1
