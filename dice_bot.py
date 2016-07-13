@@ -107,5 +107,5 @@ async def roll(ctx, *, roll : str):
         raise err
 
 # Start the bot with the appropriate credentials
-bot.run('sirmodimore+pythia@gmail.com', 'SnakeCity')
+# bot.run(login_email, password)
 # bot.run('login_token')
