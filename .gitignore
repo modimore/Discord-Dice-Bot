@@ -66,14 +66,8 @@ docs/_build/
 # PyBuilder
 target/
 
-# IPython Notebook
-.ipynb_checkpoints
-
 # pyenv
 .python-version
-
-# celery beat schedule file
-celerybeat-schedule
 
 # dotenv
 .env
@@ -81,9 +75,4 @@ celerybeat-schedule
 # virtualenv
 venv/
 ENV/
-
-# Spyder project settings
-.spyderproject
-
-# Rope project settings
-.ropeproject
+discord-env/

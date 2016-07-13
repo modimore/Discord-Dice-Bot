@@ -20,9 +20,9 @@ class DiceRoller:
         patterns = {}
 
         patterns["dice"] = r"(?:(?P<num_dice>\d+)d(?:(?P<min_val>\d+)~)?(?P<max_val>\d+)(?:\:(?P<option>\w+))?)"
-        patterns["mod"]  = r"(?:(?P<mod>[\+\-]?\s*\d+))"
+        patterns["mod"]  = r"(?P<mod_val>\d+)"
 
-        patterns["match_unit"] = r"\b({0})\b".format('|'.join( [patterns["dice"], patterns["mod"]] ))
+        patterns["match_unit"] = r"((?P<sign>[\+\-])?\s*({0}))\b".format('|'.join( [patterns["dice"], patterns["mod"]] ))
 
         # Parse out all dice rolls and range rolls
         results = []
@@ -35,9 +35,9 @@ class DiceRoller:
                 # All missing match groups will have a value of None
 
                 # Check the possible match patterns
-                if groups["mod"] is not None:
+                if groups["mod_val"] is not None:
                     # The match is a modifier
-                    results.append( Modifier( int(groups["mod"].replace(" ", "")) ) )
+                    results.append( Modifier( int(match.expand("\g<1>").replace(" ", "")) ) )
                 elif groups["num_dice"] is not None:
                     # The match is a dice roll
                     if groups["option"] is None:
@@ -96,5 +96,5 @@ class DiceRoller:
         return [ res.rolls for res in self._rolls ]
 
     def roll_detail_strings(self):
-        return [ "({})".format( ', '.join(str(x) for x in vals)) for vals in self.details ]
+        return [ str(roll) for roll in self._rolls ]
     # ==========================================================================

@@ -6,7 +6,7 @@ from random import randint
 # Base dice class
 # Implements straightforward rolling functionality and basic utilities
 class DicePool:
-    def __init__(self, face_max, face_min=1, num_dice=1, roll=False):
+    def __init__(self, face_max, face_min=1, num_dice=1):
         # Set high and low face values
         self._low = face_min if face_min is not None else 1
         self._high = face_max
@@ -15,9 +15,6 @@ class DicePool:
 
         if self._low > self._high or self._num_dice < 0:
             raise DiceToolsError()
-
-        if roll == True:
-            self.roll()
 
     # Implementation of rolling functionality
     def roll_die(self):
@@ -60,3 +57,6 @@ class DicePool:
     def avg(self):
         # Average result of rolling this group
         return self._num_dice * (self._low + self._high) / 2
+
+    def __str__(self):
+        return "({0})".format(', '.join(str(x) for x in self.rolls))

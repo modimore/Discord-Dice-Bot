@@ -25,3 +25,6 @@ class Modifier:
     @property
     def avg(self):
         return self._val
+
+    def __str__(self):
+        return str(self._val)
