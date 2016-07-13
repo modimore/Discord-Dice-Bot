@@ -6,7 +6,7 @@ from discord.ext import commands
 
 import re # regular expression support
 
-from dice_tools import DiceRoller
+from dice_tools.rollers import DiceRoller
 from dice_tools.rollers.statistical import MaxRoller, MinRoller, AvgRoller
 
 from dice_tools.exceptions import DiceToolsError
@@ -14,9 +14,15 @@ from dice_tools.exceptions import DiceToolsError
 # RegEx patterns used in this script
 patterns = {}
 
-patterns["flag"] = r"\-\w+"
+patterns["flag"] = r"\-[^\W\d]+"
 
-patterns["simple roll"] = r"((\d+d(\d+\-)?\d+(:\w+)?|\d+)\s*[\-\+]\s*)*\s*(\d+d(\d+\-)?\d+(:\w+)|\d+)"
+patterns["sign"] = r"[\+\-]"
+patterns["dice"] = r"\d+d(\d+~)?\d+(:\w+)?"
+patterns["mod"]  = r"\d+"
+
+patterns["single roll"] = r"{0}?\s*(({1})|({2}))\b".format(patterns["sign"], patterns["dice"], patterns["mod"])
+
+patterns["simple roll"] = r"({0})+".format(patterns["single roll"])
 patterns["flagged roll"] = r"({0}\s+)+\s*{1}".format(patterns["flag"], patterns["simple roll"])
 
 # Create dice bot and register commands
@@ -40,7 +46,7 @@ def construct_message(roller, author, verbose=True):
     if verbose == False:
         message = "{0} rolled a total of `{1}`.".format(author.mention, roller.result)
     else:
-        details = ' + '.join(roller.roll_detail_strings())
+        details = '; '.join(roller.roll_detail_strings())
         message = "{0} rolled a total of `{1}` from `{2}`.".format(author.mention, roller.result, details)
     return message
 
@@ -72,7 +78,7 @@ async def roll(ctx, *, roll : str):
             flags = [ f[1:] for f in re.findall( patterns["flag"], roll) ]
 
             # Create a roller from just the dice spec
-            roll = re.sub(r"\s*\-\w+\s*", "", roll)
+            roll = re.sub(r"\s*\-[^\W\d]+\s*", "", roll)
 
             # Say something based on the flags found
             if "max" in flags:

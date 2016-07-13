@@ -38,7 +38,7 @@ This is currently the only supported command. The command must be followed by a 
 
 Write your command to the bot as `!roll (spec)`. Here are some examples.
 
-- `!roll 1d10 + 2d8 + 3`
+- `!roll 1d10 - 2d8 + 3`
 - `!roll -avg 2d8 + 3`
 - `!roll 1d20:adv + 4`
 
@@ -62,9 +62,9 @@ As an example, rolling `4d10:best` with rolls of *2*, *4*, *6*, and *7* would ge
 Modifiers are simpler. A modifier is just an integer. `5`. You got it.
 
 #### Bringing it all together
-Combining groups of dice and modifiers is done just like adding numbers. `1d20 + 5` will result in *17* if you rolled a *12*.
+Combining groups of dice and modifiers is done just like adding numbers. `1d20 + 5` will result in *17* if you rolled a *12*. Just to make the rest of these examples easier let's assume you always roll *12* on a d20 in this section.
 
-You can also subtract modifiers, so if the specification above was `1d20 - 5` instead you would get a result of *7*. Dice groups cannot be subtracted, only added, but this may be changed in the future.
+You can also subtract things, so if the specification above was `1d20 - 5` instead you would get a result of *7*. If it was `5 - 1d20` we would end up with *-7*.
 
 It is worth noting that in most cases, the spaces between dice groups and modifiers will not matter. `1d20 - 5 + 2d6` is functionally equivalent to `1d20-5+2d6` and `1d20- 5 +2d6`, but `1d 20 + 5 + 3 d6` will produce unexpected behaviour. The same goes for dice options. `1d20 :adv` and `1d20: adv` are not guaranteed to get you what you were looking for.
 

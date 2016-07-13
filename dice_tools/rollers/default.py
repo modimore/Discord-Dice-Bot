@@ -2,7 +2,7 @@
 import re
 
 # Import dice classes
-from ..dice.basic import SimpleDice, HighestRollDice, LowestRollDice
+from ..dice.simple import SimpleDice, HighestRollDice, LowestRollDice
 from ..dice.dnd_5e import AdvantageDice, DisadvantageDice
 from ..dice.modifier import Modifier
 
@@ -22,7 +22,7 @@ class DiceRoller:
         patterns["dice"] = r"(?:(?P<num_dice>\d+)d(?:(?P<min_val>\d+)~)?(?P<max_val>\d+)(?:\:(?P<option>\w+))?)"
         patterns["mod"]  = r"(?P<mod_val>\d+)"
 
-        patterns["match_unit"] = r"((?P<sign>[\+\-])?\s*({0}))\b".format('|'.join( [patterns["dice"], patterns["mod"]] ))
+        patterns["match_unit"] = r"((?P<sign>\-)?\s*({0}))\b".format('|'.join( [patterns["dice"], patterns["mod"]] ))
 
         # Parse out all dice rolls and range rolls
         results = []
@@ -44,31 +44,36 @@ class DiceRoller:
                         results.append( SimpleDice(
                                                    face_max=int(groups["max_val"]),
                                                    face_min=int(groups["min_val"]) if groups["min_val"] is not None else None,
-                                                   num_dice=int(groups["num_dice"])
+                                                   num_dice=int(groups["num_dice"]),
+                                                   negative=groups["sign"] is not None
                                                   ))
                     elif groups["option"] in ["best", "b", "high", "h"]:
                         results.append( HighestRollDice(
                                                         face_max=int(groups["max_val"]),
                                                         face_min=int(groups["min_val"]) if groups["min_val"] is not None else None,
-                                                        num_dice=int(groups["num_dice"])
+                                                        num_dice=int(groups["num_dice"]),
+                                                        negative=groups["sign"] is not None
                                                        ))
                     elif groups["option"] in ["worst", "w", "low", "l"]:
                         results.append( LowestRollDice(
                                                        face_max=int(groups["max_val"]),
                                                        face_min=int(groups["min_val"]) if groups["min_val"] is not None else None,
-                                                       num_dice=int(groups["num_dice"])
+                                                       num_dice=int(groups["num_dice"]),
+                                                       negative=groups["sign"] is not None
                                                       ))
                     elif groups["option"] in ["advantage", "adv", "a"]:
                         results.append( AdvantageDice(
                                                       face_max=int(groups["max_val"]),
                                                       face_min=int(groups["min_val"]) if groups["min_val"] is not None else None,
-                                                      num_dice=int(groups["num_dice"])
+                                                      num_dice=int(groups["num_dice"]),
+                                                      negative=groups["sign"] is not None
                                                      ))
                     elif groups["option"] in ["disadvantage", "disadv", "dis", "da", "d"]:
                         results.append( DisadvantageDice(
                                                          face_max=int(groups["max_val"]),
                                                          face_min=int(groups["min_val"]) if groups["min_val"] is not None else None,
-                                                         num_dice=int(groups["num_dice"])
+                                                         num_dice=int(groups["num_dice"]),
+                                                         negative=groups["sign"] is not None
                                                         ))
                     else:
                         raise InvalidDiceOptionError(groups["option"])

@@ -1,4 +1,4 @@
-from .basic import SimpleDice
+from .simple import SimpleDice
 
 class AdvantageDice(SimpleDice):
     def roll(self):
@@ -12,7 +12,7 @@ class AdvantageDice(SimpleDice):
 
     @property
     def value(self):
-        return sum(self._rolls_kept)
+        return sum(self._rolls_kept) * self._sign
 
     @property
     def rolls(self):
@@ -21,7 +21,7 @@ class AdvantageDice(SimpleDice):
     @property
     def avg(self, num_samples=100000):
         total = sum(max(self.roll_die(), self.roll_die()) for i in range(num_samples))
-        return self._num_dice * total / num_samples
+        return self._num_dice * total / num_samples * self._sign
 
 class DisadvantageDice(AdvantageDice):
     def roll(self):
@@ -36,4 +36,4 @@ class DisadvantageDice(AdvantageDice):
     @property
     def avg(self, num_samples=100000):
         total = sum(min(self.roll_die(), self.roll_die()) for i in range(num_samples))
-        return self._num_dice * total / num_samples
+        return self._num_dice * total / num_samples * self._sign
