@@ -75,4 +75,7 @@ target/
 # virtualenv
 venv/
 ENV/
+
+# custom
 discord-env/
+doc/
