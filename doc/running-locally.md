@@ -13,7 +13,7 @@ The only packages that you need to install to run this is [discord.py] and its d
 [discord.py] is available via PyPI and can be installed using `pip install discord.py` or an equivalent command.
 
 [discord.py]: https://github.com/Rapptz/discord.py
-[requirements.txt]: https://github.com/modimore/Discord-Dice-Roller/requirements.txt
+[requirements.txt]: https://github.com/modimore/Discord-Dice-Bot/blob/master/requirements.txt
 
 To change this script to work with Python 3.4,
 replace `async def` with `@asyncio.corouting`

@@ -4,9 +4,9 @@ All commands issued to this bot must be prefaced with a special character, *!*. 
 Your instance may use a different command prefix, but *!* will be used in all examples here.
 
 ## !roll
-This is currently the only supported command. The command must be followed by a specification for what you are rolling, which is detailed on the [Dice Specification][dice-spec] page.
+This is currently the only supported command. The command must be followed by a specification for what you are rolling, which is detailed on the [Roll Specification][roll-spec] page.
 
-[dice-spec]: https://github.com/modimore/Discord-Dice-Bot/doc/dice-spec.md
+[roll-spec]: https://github.com/modimore/Discord-Dice-Bot/blob/master/doc/roll-spec.md
 
 Write your command to the bot as `!roll (spec)`. Here are some examples.
 
