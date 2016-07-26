@@ -9,19 +9,21 @@ For information on how to talk to the bot, using my instance of the bot, or runn
 - [Commands][commands]
 - [Roll Specification][roll spec]
 
-[commands]: https://github.com/modimore/Discord-Dice-Bot/doc/commands.md
-[roll spec]: https://github.com/moimore/Discord-Dice-Bot/doc/roll-spec.md
+[commands]: https://github.com/modimore/Discord-Dice-Bot/blob/master/doc/commands.md
+[roll spec]: https://github.com/modimore/Discord-Dice-Bot/blob/master/doc/roll-spec.md
 
 ## Setting up the bot (server administrators)
 - [Adding the bot to your server][your server]
 
-[your server]: https://github.com/modimore/Discord-Dice-Bot/doc/your-server.md
+[your server]: https://github.com/modimore/Discord-Dice-Bot/blob/master/doc/your-server.md
 
 ## Running and Modifying the bot (programmers, server administrators)
 - [Running locally][run local]
 - [Writing Extensions][soon]
 - [Contributing][soon]
 
-[run local]: https://github.com/modimore/Discord-Dice-Bot/doc/running-locally.md
-[extensions]: https://github.com/modimore/Discord-Dice-Bot/doc/extensions.md
-[contributing]: https://github.com/modimore/Discord-Dice-Bot/contributing.md
+[run local]: https://github.com/modimore/Discord-Dice-Bot/blob/master/doc/running-locally.md
+[extensions]: https://github.com/modimore/Discord-Dice-Bot/blob/master/doc/extensions.md
+[contributing]: https://github.com/modimore/Discord-Dice-Bot/blob/master/contributing.md
+
+[soon]: https://github.com/modimore/Discord-Dice-Bot/blob/master/doc/soon.md
