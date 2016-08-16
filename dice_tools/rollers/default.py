@@ -1,10 +1,13 @@
+'''
+Default dice roller class implementation.
+'''
+
 # Regular Expressions for input validation and parsing
 import re
 
 # Import dice classes
-from ..dice import SimpleDice, HighestRollDice, LowestRollDice
+from ..dice import SimpleDice, HighestRollDice, LowestRollDice, Modifier
 from ..dice.dnd_5e import AdvantageDice, DisadvantageDice
-from ..dice.modifier import Modifier
 
 # Import dice errors
 from ..exceptions import DiceToolsError, InvalidDiceSpecError, InvalidDiceOptionError
@@ -12,10 +15,12 @@ from ..exceptions import DiceToolsError, InvalidDiceSpecError, InvalidDiceOption
 # Class to manage all dice rolls
 # Serves both as a factory for dice and a reporting agent for results
 class DiceRoller:
+    ''' A class that parses and executes dice rolls. '''
     # Initialization Functions =================================================
-    # Roll specification parsing function
     @staticmethod
     def parse_spec(spec):
+        ''' Roll specification parsing function '''
+
         # RegEx Patterns used in this parser
         patterns = {}
 
@@ -94,12 +99,15 @@ class DiceRoller:
     # Intended accessors to roll results =======================================
     @property
     def result(self):
+        ''' Return sum of the values of all rolls. '''
         return sum(res.value for res in self._rolls)
 
     @property
     def details(self):
+        ''' Return list of individual rolled values for each roll. '''
         return [ res.rolls for res in self._rolls ]
 
     def roll_detail_strings(self):
+        ''' Return list of string conversions of rolls. '''
         return [ str(roll) for roll in self._rolls ]
     # ==========================================================================

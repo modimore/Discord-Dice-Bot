@@ -98,7 +98,7 @@ async def roll(ctx, *, roll : str):
             roller = DiceRoller(roll)
             await bot.say( construct_message(roller, author) )
         else:
-            await bot.say("{0}, you haven't really specified a dice roll honestly. Please try harder.".format(author.mention))
+            await bot.say("{0}, the specification you provided did not match any of our roll patterns. Please try again.".format(author.mention))
     except DiceToolsError as err:
         await bot.say("{0}, your roll has produced an error with the following message:\n**{1}**\n Please fix your roll and try again.".format(author.mention, err.get_message()))
     except Exception as err:
