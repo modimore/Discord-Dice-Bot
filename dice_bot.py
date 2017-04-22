@@ -20,7 +20,7 @@ patterns["sign"] = r"[\+\-]"
 patterns["dice"] = r"\d+d(\d+~)?\d+(:\w+)?"
 patterns["mod"]  = r"\d+"
 
-patterns["single roll"] = r"{0}?\s*(({1})|({2}))\b".format(patterns["sign"], patterns["dice"], patterns["mod"])
+patterns["single roll"] = r"{0}?\s*({1}|{2})\b".format(patterns["sign"], patterns["dice"], patterns["mod"])
 
 patterns["simple roll"] = r"({0})+".format(patterns["single roll"])
 patterns["flagged roll"] = r"({0}\s+)+\s*{1}".format(patterns["flag"], patterns["simple roll"])
@@ -30,19 +30,31 @@ bot = commands.Bot(command_prefix='!', description="A Discord chat bot for Table
 
 @bot.event
 async def on_ready():
+    """The callback invoked when login and connection succeed."""
     print("Bot running as {0}({1})...".format(bot.user.name, bot.user.id))
 
 @bot.event
 async def on_message(message):
-    print(message, message.server, message.author)
-    print(message.content)
-
+    """
+    The callback invoked when the bot receives a message.
+    
+    The only difference from the default is that when an error occurs,
+    the message and error are printed here.
+    
+    :param message: The message that was received.
+    """
     try:
         await bot.process_commands(message)
     except Exception as err:
-        print(err)
+        print(message, err)
 
-def construct_message(roller, author, verbose=True):
+def construct_message(roller, author, detail=True):
+    """Constructs the result message for a random dice roll as as a string.
+    
+    :param roller: The dice roller object with the roll result
+    :param author: The original message author
+    :param detail: Flag indicating whether or not to include roll details.
+    """
     if verbose == False:
         message = "{0} rolled a total of `{1}`.".format(author.mention, roller.result)
     else:
@@ -56,7 +68,7 @@ async def roll(ctx, *, roll : str):
     """
     Rolls dice based on user messages.
     Reports result back to channel.
-
+    
     Currently supports:
         (x1)d(y1) + (x2)d(y2) + ... + (xN)d(yN) + m1 + m2 + ... +  mN
         with the following dice-specific options applied as '(x)d(y):opt':
@@ -71,7 +83,7 @@ async def roll(ctx, *, roll : str):
             avg
     """
     author = ctx.message.author
-
+    
     try:
         if re.match( patterns["flagged roll"], roll):
             # Find all flags
