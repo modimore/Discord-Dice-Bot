@@ -1,42 +1,55 @@
+'''
+Representations of core dice types.
+'''
+
 from .base import DiceBase
 
-# Dice class to implement rolling functionality
 class SimpleDice(DiceBase):
-    # Roll History Accessors
+    ''' Simple dice, value is sum of all rolls. '''
     @property
     def value(self):
-        # Return the specified value for the dice object
+        ''' Return sum of all rolls, multipled by sign. '''
         return sum(self._rolls) * self._sign
 
+    @property
+    def avg(self):
+        ''' Contstant-time average calculation.'''
+        return self._num_dice * self._sign * (self._low + self._high)/2
+
 class PickOneDice(DiceBase):
+    '''
+    Base class for dice groups that will only use a single dice roll from many.
+    No value implementation. Must be specified in a derived class.
+    '''
+
     @property
     def max(self):
-        return self._high if not self._negative else self._low
+        ''' Return the highest value possible on a single dice. '''
+        return self._high if not self._negative else (-1 * self._low)
 
     @property
     def min(self):
-        return self._low if not self._negative else self._high
+        ''' Return the lowest value possible on a single dice. '''
+        return self._low if not self._negative else (-1 * self._high)
 
 class HighestRollDice(PickOneDice):
-    @property
-    def value(self):
-        return max(self._rolls) * self._sign
+    ''' Dice group for which value is the highest roll. '''
 
     @property
-    def avg(self, num_samples=100000):
-        total = 0
-        for i in range(num_samples):
-            total += max(self.roll_die() for i in range(self._num_dice))
-        return total / num_samples * self._sign
+    def value(self):
+        ''' Return the highest value rolled. '''
+        if self._negative:
+            return min(self._rolls) * -1
+        else:
+            return max(self._rolls)
 
 class LowestRollDice(PickOneDice):
-    @property
-    def value(self):
-        return min(self._rolls) * self._sign
+    ''' Dice group for which value is the lowest roll. '''
 
     @property
-    def avg(self, num_samples=100000):
-        total = 0
-        for i in range(num_samples):
-            total += min(self.roll_die() for i in range(self._num_dice))
-        return total / num_samples * self._sign
+    def value(self):
+        ''' Return the lowest value rolled. '''
+        if self._negative:
+            return max(self._rolls) * -1
+        else:
+            return min(self._rolls)
